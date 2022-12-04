@@ -2,7 +2,6 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
 const art = require("ascii-art");
-const { response } = require("express");
 
 require("dotenv").config();
 
@@ -112,8 +111,160 @@ const viewEmployees = () => {
   );
 };
 
-// add functions
-
 // update functions
+// update employee/manager
+
+const updateEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        message: "Enter employee ID",
+        type: "input",
+        name: "id",
+      },
+      {
+        message: "Enter new role ID",
+        type: "input",
+        name: "newRole",
+      },
+    ])
+    .then((response) => {
+      connection.query(
+        "UPDATE employee SET role_id=? WHERE id=?",
+        [response.newRole, response.id],
+        function (err, res) {
+          if (err) throw err;
+          console.log("Employee role updated!");
+          menu();
+        }
+      );
+    });
+};
+
+const updateManager = () => {
+  inquirer
+    .prompt([
+      {
+        message: "Enter employee ID",
+        type: "input",
+        name: "id",
+      },
+      {
+        message: "Enter new Manager's ID",
+        type: "input",
+        name: "newManager",
+      },
+    ])
+    .then((response) => {
+      connection.query(
+        "UPDATE employee SET manager_id=? WHERE id=?",
+        [response.newManager, response.id],
+        function (err, res) {
+          if (err) throw err;
+          console.log("Employee manager updated!");
+          menu();
+        }
+      );
+    });
+};
+
+// add functions
+// add dept/employee/role
+
+const addDepartment = () => {
+  inquirer
+    .prompt([
+      {
+        message: "Enter the department you would like to add:",
+        type: "input",
+        name: "newDept",
+      },
+    ])
+    .then((response) => {
+      connection.query(
+        "INSERT INTO department (name) VALUES (?)",
+        [response.newDept],
+        function (err, res) {
+          if (err) throw err;
+          console.log("New department added!");
+          menu();
+        }
+      );
+    });
+};
+
+const addRole = () => {
+  inquirer
+    .prompt([
+      {
+        message: "Enter the role title you would like to add:",
+        type: "input",
+        name: "roleTitle",
+      },
+      {
+        message: "Enter the new role's salary:",
+        type: "input",
+        name: "roleSalary",
+      },
+      {
+        message: "Enter the department ID for this new role:",
+        type: "input",
+        name: "roleDept",
+      },
+    ])
+    .then((response) => {
+      connection.query(
+        "INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)",
+        [response.roleTitle, response.roleSalary, response.roleDept],
+        function (err, res) {
+          if (err) throw err;
+          console.log("New role added!");
+          menu();
+        }
+      );
+    });
+};
+
+const addEmployee = () => {
+  inquirer
+    .prompt([
+      {
+        message: "Enter new employee's first name:",
+        type: "input",
+        name: "firstName",
+      },
+      {
+        message: "Enter new employee's last name:",
+        type: "input",
+        name: "lastName",
+      },
+      {
+        message: "Enter new employee's role ID:",
+        type: "input",
+        name: "newRoleId",
+      },
+      {
+        message: "Enter new employee's manager's ID:",
+        type: "input",
+        name: "newManagerId",
+      },
+    ])
+    .then((response) => {
+      connection.query(
+        "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
+        [
+          response.firstName,
+          response.lastName,
+          response.newRoleId,
+          response.newManagerId,
+        ],
+        function (err, res) {
+          if (err) throw err;
+          console.log("New employee added!");
+          menu();
+        }
+      );
+    });
+};
 
 start();
