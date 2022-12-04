@@ -1,28 +1,26 @@
-const mysql = require('mysql2');
-const inquirer = require('inquirer');
-const consoleTable = require('console.table');
-const art = require('ascii-art');
-const { response } = require('express');
+const mysql = require("mysql2");
+const inquirer = require("inquirer");
+const consoleTable = require("console.table");
+const art = require("ascii-art");
+const { response } = require("express");
 
 require("dotenv").config();
 
-const connection = mysql.createConnection(
-  {
-    host: "localhost",
-    // MySQL username,
-    user: process.env.DB_USER,
-    // MySQL password
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-  });
+const connection = mysql.createConnection({
+  host: "localhost",
+  // MySQL username,
+  user: process.env.DB_USER,
+  // MySQL password
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 
-  const start = () => {
-    art.font("Employee Tracker!", 'doom')
-       .then((rendered)=>{
-           console.log(rendered);
-           menu();
-       });
-  };
+const start = () => {
+  art.font("Employee Tracker!", "doom").then((rendered) => {
+    console.log(rendered);
+    menu();
+  });
+};
 
 // view all employees; viewEmployees
 // add employee; addEmployee
@@ -34,54 +32,56 @@ const connection = mysql.createConnection(
 // add department; addDepartment
 
 const menu = () => {
-    inquirer.prompt([
-        {
-            message: 'What would you like to do?',
-            type: 'list',
-            name: 'menu',
-            choices: [
-                'View all employees', 
-                'Add employee',
-                'Update employee role',
-                'Update manager',
-                'View all roles',
-                'Add role',
-                'View all departments',
-                'Add department',
-                'Exit',
-            ],
-        },
-    ]) .then((response => {
-        switch(response.menu) {
-            case 'View all employees':
-                viewEmployees();
-                break;
-            case 'Add employee':
-                addEmployee();
-                break;
-            case 'Update employee role':
-                updateEmployee();
-                break;
-            case 'Update manager':
-                updateManager();
-                break;
-            case 'View all roles':
-                viewRoles();
-                break;
-            case 'Add role':
-                addRole();
-                break;
-            case 'View all departments':
-                viewDepartments();
-                break;
-            case 'Add department':
-                addDepartment();
-                break;
-            case 'Exit':
-                connection.end();
-                break;                                
-        }
-    }));
+  inquirer
+    .prompt([
+      {
+        message: "What would you like to do?",
+        type: "list",
+        name: "menu",
+        choices: [
+          "View all employees",
+          "Add employee",
+          "Update employee role",
+          "Update manager",
+          "View all roles",
+          "Add role",
+          "View all departments",
+          "Add department",
+          "Exit",
+        ],
+      },
+    ])
+    .then((response) => {
+      switch (response.menu) {
+        case "View all employees":
+          viewEmployees();
+          break;
+        case "Add employee":
+          addEmployee();
+          break;
+        case "Update employee role":
+          updateEmployee();
+          break;
+        case "Update manager":
+          updateManager();
+          break;
+        case "View all roles":
+          viewRoles();
+          break;
+        case "Add role":
+          addRole();
+          break;
+        case "View all departments":
+          viewDepartments();
+          break;
+        case "Add department":
+          addDepartment();
+          break;
+        case "Exit":
+          connection.end();
+          break;
+      }
+    });
 };
 
 // simple views
@@ -101,4 +101,19 @@ const viewRoles = () => {
   });
 };
 
-  start();
+const viewEmployees = () => {
+  connection.query(
+    "SELECT employee.id, first_name, last_name, title, salary, name, manager_id FROM ((department JOIN role ON department.id = role.department_id) JOIN employee ON role.id = employee.role_id);",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      menu();
+    }
+  );
+};
+
+// add functions
+
+// update functions
+
+start();
